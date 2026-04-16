@@ -15,6 +15,9 @@ import { generateAuthTokens, verifyToken } from '../token/token.service';
  */
 export const loginUserWithEmailAndPassword = async (email: string, password: string): Promise<IUserDoc> => {
   const user = await getUserByEmail(email);
+
+  console.log(user);
+  
   if (!user || !(await user.isPasswordMatch(password))) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
   }
