@@ -252,6 +252,44 @@ describe('User routes', () => {
       expect(res.body.results[0].id).toBe(userOne._id.toHexString());
     });
 
+    test('should correctly apply a partial case-insensitive filter on name combined with role', async () => {
+      const partialMatchAdmin = {
+        ...admin,
+        name: 'Juan Francisco',
+      };
+      const secondPartialMatchAdmin = {
+        ...userTwo,
+        _id: new mongoose.Types.ObjectId(),
+        email: faker.internet.email().toLowerCase(),
+        role: 'admin',
+        name: 'francesca lopez',
+      };
+      const nonMatchingUser = {
+        ...userOne,
+        name: 'Maria Gomez',
+      };
+
+      await insertUsers([nonMatchingUser, partialMatchAdmin, secondPartialMatchAdmin]);
+
+      const res = await request(app)
+        .get('/v1/users')
+        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .query({ role: 'admin', name: 'FrA' })
+        .send()
+        .expect(httpStatus.OK);
+
+      expect(res.body).toEqual({
+        results: expect.any(Array),
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+        totalResults: 2,
+      });
+      expect(res.body.results).toHaveLength(2);
+      expect(res.body.results[0].id).toBe(partialMatchAdmin._id.toHexString());
+      expect(res.body.results[1].id).toBe(secondPartialMatchAdmin._id.toHexString());
+    });
+
     test('should correctly apply filter on role field', async () => {
       await insertUsers([userOne, userTwo, admin]);
 
