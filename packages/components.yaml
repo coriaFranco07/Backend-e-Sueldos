@@ -19,6 +19,37 @@ components:
         name: fake name
         role: user
 
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        stock:
+          type: number
+        category:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      example:
+        id: 5ebac534954b54139806c112
+        name: Sample Product
+        description: This is a sample product
+        price: 29.99
+        stock: 100
+        category: Electronics
+        createdAt: 2023-01-01T00:00:00.000Z
+        updatedAt: 2023-01-01T00:00:00.000Z
+
     Token:
       type: object
       properties:
@@ -56,6 +87,15 @@ components:
           type: string
 
   responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: 400
+            message: Bad Request
     DuplicateEmail:
       description: Email already taken
       content:
